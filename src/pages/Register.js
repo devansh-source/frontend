@@ -7,15 +7,30 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Backend URL from environment variable or fallback
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const handleRegister = async () => {
+    if (!username || !email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
-      const { data } = await axios.post("http://localhost:5000/api/users/register", {
-        username, email, password
+      const { data } = await axios.post(`${API_URL}/api/users/register`, {
+        username,
+        email,
+        password
       });
 
-      alert(data.message); // popup alert
+      // Pop-up message after successful registration
+      alert(data.message);
+
+      // Redirect to login page
       window.location.href = "/login";
+
     } catch (err) {
+      // Show error message
       alert(err.response?.data?.error || "Registration failed");
     }
   };
@@ -23,11 +38,27 @@ const Register = () => {
   return (
     <div className="container">
       <h2>Register</h2>
-      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-      <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <input
+        placeholder="Username"
+        value={username}
+        onChange={e => setUsername(e.target.value)}
+      />
+      <input
+        placeholder="Email"
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+      />
+      <input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+      />
       <button onClick={handleRegister}>Register</button>
-      <p>Already have an account? <a href="/login">Login</a></p>
+      <p>
+        Already have an account? <a href="/login">Login</a>
+      </p>
     </div>
   );
 };
