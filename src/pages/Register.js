@@ -1,31 +1,35 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import API from "../api"; 
-import { toast } from "react-toastify"; 
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import API from "../api"; // Import the central API instance
+import { toast } from "react-toastify"; // Import toast for notifications
 import "./styles.css";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialize the navigate function
 
   const handleRegister = async () => {
+    // 1. Add basic validation
     if (!username || !email || !password) {
-      toast.error("Please fill all fields");
+      toast.error("Please fill in all fields");
       return;
     }
 
     try {
+      // 2. Use the central API instance
       const { data } = await API.post("/api/users/register", {
         username,
         email,
-        password
+        password,
       });
 
+      // 3. Use toast for notifications, not alert()
       toast.success(data.message);
-      navigate("/login"); 
 
+      // 4. Use navigate for redirection
+      navigate("/login");
     } catch (err) {
       toast.error(err.response?.data?.error || "Registration failed");
     }
@@ -37,19 +41,19 @@ const Register = () => {
       <input
         placeholder="Username"
         value={username}
-        onChange={e => setUsername(e.target.value)}
+        onChange={(e) => setUsername(e.target.value)}
       />
       <input
         placeholder="Email"
         type="email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
       />
       <input
         placeholder="Password"
         type="password"
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
       />
       <button onClick={handleRegister}>Register</button>
       <p>
