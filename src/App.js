@@ -1,21 +1,19 @@
-// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Products from "./pages/Products";
+import Products from "./pages/Products"; // ध्यान दें: आपने इसका नाम Product.js रखा है, लेकिन कंपोनेंट का नाम Products है
 import Sales from "./pages/Sales";
 import PrivateRoute from "./components/PrivateRoute";
 
-// Import the ToastContainer and its CSS
+// Toastify को इम्पोर्ट करें
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <Router>
-      {/* This component renders the popups */}
       <ToastContainer
         position="top-right"
         autoClose={5000}

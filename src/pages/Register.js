@@ -1,37 +1,33 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import API from "../api"; 
+import { toast } from "react-toastify"; 
 import "./styles.css";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // Backend URL from environment variable or fallback
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     if (!username || !email || !password) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     try {
-      const { data } = await axios.post(`${API_URL}/api/users/register`, {
+      const { data } = await API.post("/api/users/register", {
         username,
         email,
         password
       });
 
-      // Pop-up message after successful registration
-      alert(data.message);
-
-      // Redirect to login page
-      window.location.href = "/login";
+      toast.success(data.message);
+      navigate("/login"); 
 
     } catch (err) {
-      // Show error message
-      alert(err.response?.data?.error || "Registration failed");
+      toast.error(err.response?.data?.error || "Registration failed");
     }
   };
 

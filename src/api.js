@@ -1,8 +1,9 @@
-// src/api.js
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://backend-bguf.onrender.com';
+
 const API = axios.create({
-  baseURL: 'https://backend-bguf.onrender.com'
+  baseURL: API_URL
 });
 
 API.interceptors.request.use((req) => {
