@@ -1,68 +1,49 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import API from "../api";
 import "./styles.css";
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const [products, setProducts] = useState([]);
   const [sales, setSales] = useState([]);
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const productRes = await axios.get("https://backend-bguf.onrender.com/api/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(productRes.data);
+      try {
+        const productRes = await API.get("/api/products");
+        setProducts(productRes.data);
 
-      const salesRes = await axios.get("https://backend-bguf.onrender.com/api/sales", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSales(salesRes.data);
+        const salesRes = await API.get("/api/sales");
+        setSales(salesRes.data);
+      } catch (error) {
+        toast.error("Failed to fetch dashboard data.");
+        console.error("Fetch data error:", error);
+      }
     };
     fetchData();
-  }, [token]);
+  }, []);
 
-  // Calculate total revenue
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.info("You have been logged out.");
+    navigate("/login");
+  };
+  
   const totalRevenue = sales.reduce((acc, s) => acc + s.totalPrice, 0);
-
-  // Count low stock products
   const lowStockCount = products.filter(p => p.quantity < 5).length;
 
   return (
     <div className="container">
       <h2>Welcome to Inventory Dashboard</h2>
-
       <nav className="nav">
         <Link to="/products">Products</Link>
         <Link to="/sales">Sales</Link>
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
-          }}
-        >
-          Logout
-        </button>
+        <button onClick={handleLogout}>Logout</button>
       </nav>
-
       <div className="stats">
-        <div className="card">
-          <h3>Total Products</h3>
-          <p>{products.length}</p>
-        </div>
-        <div className="card">
-          <h3>Total Sales</h3>
-          <p>{sales.length}</p>
-        </div>
-        <div className="card">
-          <h3>Total Revenue</h3>
-          <p>Rs.{totalRevenue}</p>
-        </div>
-        <div className="card">
-          <h3>Low Stock Items</h3>
-          <p>{lowStockCount}</p>
-        </div>
+        {/* ... your stat cards ... */}
       </div>
     </div>
   );
