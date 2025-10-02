@@ -3,12 +3,12 @@ import axios from "axios";
 import "./styles.css";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");  
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const { data } = await axios.post("https://backend-bguf.onrender.com/api/users/login", { username, password });
+      const { data } = await axios.post("https://backend-bguf.onrender.com/api/users/login", { email, password }); 
       localStorage.setItem("token", data.token);
       alert("Login successful!");
       window.location.href = "/";
@@ -20,10 +20,22 @@ const Login = () => {
   return (
     <div className="container">
       <h2>Login</h2>
-      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <input
+        placeholder="Email"
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)} // ✅ setEmail
+      />
+      <input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+      />
       <button onClick={handleLogin}>Login</button>
-      <p>Don't have an account? <a href="/register">Register</a></p>
+      <p>
+        Don't have an account? <a href="/register">Register</a>
+      </p>
     </div>
   );
 };
