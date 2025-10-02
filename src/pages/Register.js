@@ -1,7 +1,6 @@
-// src/pages/Register.js
 import React, { useState } from "react";
-import API from "../api"; // Use the centralized API file
-import { toast } from 'react-toastify'; // Import toast
+import axios from "axios";
+import "./styles.css";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -9,17 +8,12 @@ const Register = () => {
   const [password, setPassword] = useState("");
 
   const handleRegister = async () => {
-    if (!username || !email || !password) {
-      return toast.error("Please fill in all fields.");
-    }
     try {
-      const { data } = await API.post("/api/users/register", { username, email, password });
-      toast.success(data.message); // Success popup
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 2000);
+      const { data } = await axios.post("https://backend-bguf.onrender.com/api/users/register", { username, email, password });
+      alert("Registration successful! Please login.");
+      window.location.href = "/login";
     } catch (err) {
-      toast.error(err.response?.data?.error || "Registration failed"); // Error popup
+      alert(err.response?.data?.error || "Registration failed");
     }
   };
 
