@@ -1,3 +1,5 @@
+// client/src/App.js
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
@@ -7,17 +9,23 @@ import Products from "./pages/Products";
 import Sales from "./pages/Sales";
 import PrivateRoute from "./components/PrivateRoute";
 
+// REQUIRED: Import the ToastContainer and its CSS
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <Router>
+      {/* REQUIRED: This component renders the pop-up messages */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
+        newestOnTop={false}
         closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
         pauseOnHover
       />
       
