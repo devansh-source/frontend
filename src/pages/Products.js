@@ -1,76 +1,85 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "./styles.css";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../api";
+import { toast } from "react-toastify";
+import "../styles.css";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState(0);
-  const [price, setPrice] = useState(0);
-  const token = localStorage.getItem("token");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get("https://backend-bguf.onrender.com/api/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await API.get("/api/products");
       setProducts(data);
     } catch (error) {
-      console.error("Failed to fetch products", error);
+      toast.error("Failed to fetch products");
     }
   };
 
   useEffect(() => {
     fetchProducts();
-  }, [token]);
+  }, []);
 
   const addProduct = async () => {
     try {
-      await axios.post("https://backend-bguf.onrender.com/api/products", { name, quantity, price }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setName("");
-      setQuantity(0);
-      setPrice(0);
-      fetchProducts(); // Refetch products after adding a new one
+      await API.post("/api/products", { name, price, stock });
+      toast.success("Product added successfully!");
+      fetchProducts();
+      setName(""); setPrice(""); setStock("");
     } catch (error) {
-      console.error("Failed to add product", error);
+      toast.error("Failed to add product");
     }
   };
 
   const deleteProduct = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      await axios.delete(`https://backend-bguf.onrender.com/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(products.filter((p) => p._id !== id));
+      await API.delete(`/api/products/${id}`);
+      toast.success("Product deleted successfully!");
+      fetchProducts();
     } catch (error) {
-      console.error("Failed to delete product", error);
+      toast.error("Failed to delete product");
     }
   };
 
   return (
     <div className="container">
-      <h2>Products</h2>
-      <div className="form">
-        <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input placeholder="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-        <input placeholder="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+      <div className="card">
+        <h2>Products</h2>
+        <table className="table-container">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Price (₹)</th>
+              <th>Stock</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product._id}>
+                <td>{product.name}</td>
+                <td>₹{product.price}</td>
+                <td>{product.stock}</td>
+                <td>
+                  <button className="btn-delete" onClick={() => deleteProduct(product._id)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <input placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <input placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} />
+        <input placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} />
         <button onClick={addProduct}>Add Product</button>
+        <button onClick={() => navigate("/sales")}>Go to Sales</button>
       </div>
-      <ul>
-        {products.map((p) => (
-          <li key={p._id}>
-            {p.name} | Price: {p.price} | Status:{" "}
-            {p.quantity > 0 ? (
-              `In Stock (${p.quantity})`
-            ) : (
-              <span className="low-stock">Out of Stock</span>
-            )}
-            <button onClick={() => deleteProduct(p._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };

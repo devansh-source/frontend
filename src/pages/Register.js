@@ -1,10 +1,8 @@
-// client/src/pages/Register.js
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import API from "../api";
-import "./styles.css";
+import { toast } from "react-toastify";
+import "../styles.css";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -12,61 +10,44 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    if (!username || !email || !password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
+  const handleRegister = async () => {
     try {
       const { data } = await API.post("/api/users/register", {
         username,
         email,
         password,
       });
-
-      // This will show the "Registration successful!" message
       toast.success(data.message);
-
-      // CHANGE: Wait 2 seconds before redirecting to the login page
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000); // 2000 milliseconds = 2 seconds
-
-    } catch (err) {
-      toast.error(err.response?.data?.error || "Registration failed. Please try again.");
-      console.error("Registration Error:", err.response?.data || err.message);
+      navigate("/login");  // ✅ keeping manual login
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Registration failed");
     }
   };
 
   return (
     <div className="container">
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
+      <div className="card">
+        <h2>Register</h2>
         <input
+          type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
-          placeholder="Email"
           type="email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
-          placeholder="Password"
           type="password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Register</button>
-      </form>
-      <p>
-        Already have an account? <a href="/login">Login</a>
-      </p>
+        <button onClick={handleRegister}>Register</button>
+      </div>
     </div>
   );
 };
