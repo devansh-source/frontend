@@ -1,29 +1,33 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import API from "../api"; 
+import { toast } from "react-toastify"; 
+import "./styles.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     try {
-      const { data } = await axios.post("https://backend-1-y9jk.onrender.com/api/users/login", {
-        email, password
-      });
-      alert(data.message);
-      // redirect to dashboard if needed
+      const { data } = await API.post("/api/users/login", { username, password });
+      localStorage.setItem("token", data.token);
+      toast.success("Login successful!");
+      navigate("/"); 
     } catch (err) {
-      alert(err.response?.data?.message || "Error occurred");
+      toast.error(err.response?.data?.error || "Login failed");
     }
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-      <button type="submit">Login</button>
-    </form>
+    <div className="container">
+      <h2>Login</h2>
+      <input placeholder="Username or Email" value={username} onChange={e => setUsername(e.target.value)} />
+      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <button onClick={handleLogin}>Login</button>
+      <p>Don't have an account? <a href="/register">Register</a></p>
+    </div>
   );
 };
 
