@@ -5,8 +5,8 @@ import "./styles.css";
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [quantity, setQuantity] = useState();
+  const [price, setPrice] = useState();
   const token = localStorage.getItem("token");
 
   const fetchProducts = async () => {
