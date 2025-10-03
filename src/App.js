@@ -1,74 +1,43 @@
-// client/src/pages/Register.js
+// client/src/App.js
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import API from "../api";
-import "./styles.css";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Products from "./pages/Products";
+import Sales from "./pages/Sales";
+import PrivateRoute from "./components/PrivateRoute";
 
-const Register = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+// REQUIRED: Import the ToastContainer and its CSS
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    if (!username || !email || !password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    try {
-      const { data } = await API.post("/api/users/register", {
-        username,
-        email,
-        password,
-      });
-
-      // This will show the "Registration successful!" message
-      toast.success(data.message);
-
-      // CHANGE: Wait 2 seconds before redirecting to the login page
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000); // 2000 milliseconds = 2 seconds
-
-    } catch (err) {
-      toast.error(err.response?.data?.error || "Registration failed. Please try again.");
-      console.error("Registration Error:", err.response?.data || err.message);
-    }
-  };
-
+function App() {
   return (
-    <div className="container">
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Register</button>
-      </form>
-      <p>
-        Already have an account? <a href="/login">Login</a>
-      </p>
-    </div>
+    <Router>
+      {/* REQUIRED: This component renders the pop-up messages */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
+        <Route path="/sales" element={<PrivateRoute><Sales /></PrivateRoute>} />
+      </Routes>
+    </Router>
   );
-};
+}
 
-export default Register;
+export default App;
