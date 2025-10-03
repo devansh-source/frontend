@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Products from "./pages/Product";   // ✅ fixed import
+import Products from "./pages/Products";   // ✅ fixed import
 import Sales from "./pages/Sales";
 
 const App = () => {
