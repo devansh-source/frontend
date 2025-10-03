@@ -1,19 +1,19 @@
 // client/src/pages/Register.js
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // CHANGE: For redirection
-import { toast } from "react-toastify";          // CHANGE: For notifications
-import API from "../api";                         // CHANGE: Use central API file
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import API from "../api";
 import "./styles.css";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // CHANGE: Hook for navigation
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
-    e.preventDefault(); // CHANGE: Prevent form submission reload
+    e.preventDefault();
 
     if (!username || !email || !password) {
       toast.error("Please fill in all fields");
@@ -21,18 +21,21 @@ const Register = () => {
     }
 
     try {
-      // CHANGE: Use the central API instance
       const { data } = await API.post("/api/users/register", {
         username,
         email,
         password,
       });
 
+      // This will show the "Registration successful!" message
       toast.success(data.message);
-      navigate("/login"); // CHANGE: Redirect to login page after success
+
+      // CHANGE: Wait 2 seconds before redirecting to the login page
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000); // 2000 milliseconds = 2 seconds
 
     } catch (err) {
-      // CHANGE: Better error handling with toast
       toast.error(err.response?.data?.error || "Registration failed. Please try again.");
       console.error("Registration Error:", err.response?.data || err.message);
     }
@@ -41,7 +44,6 @@ const Register = () => {
   return (
     <div className="container">
       <h2>Register</h2>
-      {/* CHANGE: Use a form for better semantics and submission handling */}
       <form onSubmit={handleRegister}>
         <input
           placeholder="Username"
@@ -60,7 +62,6 @@ const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        {/* CHANGE: Set button type to "submit" */}
         <button type="submit">Register</button>
       </form>
       <p>
