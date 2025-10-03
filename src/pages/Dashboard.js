@@ -25,7 +25,6 @@ const Dashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        // Filter out any sales that don't have a valid product linked
         const validSales = (salesRes.data || []).filter(s => s.product);
         setSales(validSales);
       } catch (error) {
@@ -36,20 +35,15 @@ const Dashboard = () => {
   }, [token]);
 
   // --- CALCULATIONS ---
-
-  // 1. Total Revenue (already existed)
   const totalRevenue = sales.reduce((acc, s) => acc + s.totalPrice, 0);
-
-  // 2. Low Stock Count (already existed)
-  const lowStockCount = products.filter((p) => p.quantity < 5).length;
-
-  // 3. NEW: Total number of items sold across all sales
+  const lowStockCount = products.filter((p) => p.quantity > 0 && p.quantity < 5).length;
   const totalItemsSold = sales.reduce((acc, s) => acc + s.quantity, 0);
   
-  // 4. NEW: Low Sale Alert - Counts products that have never been sold
   const soldProductIds = new Set(sales.map(s => s.product._id));
   const unsoldProductsCount = products.filter(p => !soldProductIds.has(p._id)).length;
-
+  
+  // NEW: Count products with zero quantity
+  const outOfStockCount = products.filter(p => p.quantity === 0).length;
 
   return (
     <div className="container">
@@ -88,6 +82,10 @@ const Dashboard = () => {
         <div className="card">
           <h3>Low Stock Items</h3>
           <p>{lowStockCount}</p>
+        </div>
+        <div className="card">
+            <h3>Out of Stock</h3>
+            <p>{outOfStockCount}</p>
         </div>
         <div className="card">
           <h3>Unsold Products</h3>
