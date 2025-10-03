@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -7,28 +8,20 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("https://your-backend.onrender.com/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+      const { data } = await axios.post("https://backend-1-y9jk.onrender.com/api/users/login", {
+        email, password
       });
-      const data = await res.json();
-      if (res.ok) {
-        alert(data.message);
-        // redirect to homepage or dashboard
-        window.location.href = "/dashboard";
-      } else {
-        alert(data.message);
-      }
+      alert(data.message);
+      // redirect to dashboard if needed
     } catch (err) {
-      alert("Login failed");
+      alert(err.response?.data?.message || "Error occurred");
     }
   };
 
   return (
     <form onSubmit={handleLogin}>
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
       <button type="submit">Login</button>
     </form>
   );

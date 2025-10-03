@@ -1,31 +1,31 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("https://your-backend.onrender.com/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password })
+      const { data } = await axios.post("https://backend-1-y9jk.onrender.com/api/users/register", {
+        name, email, password
       });
-      const data = await res.json();
       alert(data.message);
-      if (res.ok) window.location.href = "/login"; // redirect to login
+      navigate("/login");
     } catch (err) {
-      alert("Registration failed");
+      alert(err.response?.data?.message || "Error occurred");
     }
   };
 
   return (
     <form onSubmit={handleRegister}>
-      <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+      <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
+      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
       <button type="submit">Register</button>
     </form>
   );
