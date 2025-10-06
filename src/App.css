@@ -1,111 +1,195 @@
+/* --- Import Google Font --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* --- CSS Variables for Easy Theming --- */
+:root {
+  --primary-color: #4a90e2; /* A slightly richer blue */
+  --primary-hover-color: #357ABD;
+  --secondary-color: #2c3e50;
+  --background-color: #f4f7f9;
+  --container-bg-color: #ffffff;
+  --text-color: #333;
+  --border-color: #dfe6e9;
+  --success-color: #27ae60;
+  --error-color: #c0392b;
+  --success-bg-color: #d4edda;
+  --error-bg-color: #f8d7da;
+  --border-radius: 10px;
+  --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
 /* ------------------ General ------------------ */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5;
-  color: #333;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2 {
   text-align: center;
-  color: #2c3e50;
-  margin-bottom: 20px;
+  color: var(--secondary-color);
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+h2 {
+  font-weight: 400;
+  opacity: 0.8;
 }
 
 /* ------------------ Container ------------------ */
 .container {
-  max-width: 900px;
-  margin: 30px auto;
-  background: #ffffff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  max-width: 950px;
+  margin: 40px auto;
+  background: var(--container-bg-color);
+  padding: 30px 40px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
+}
+
+/* ------------------ Form Sections ------------------ */
+.form-section {
+  margin-bottom: 35px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-child {
+  border-bottom: none;
 }
 
 /* ------------------ Inputs & Select ------------------ */
 input, select {
   width: 100%;
-  padding: 10px 12px;
-  margin: 8px 0 16px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  padding: 12px 15px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease-in-out;
+  background-color: #fdfdfd;
 }
 
 input:focus, select:focus {
-  border-color: #3498db;
   outline: none;
-  box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
 /* ------------------ Buttons ------------------ */
 button {
-  background-color: #3498db;
+  background-image: linear-gradient(45deg, var(--primary-color) 0%, #94c2f3 100%);
   color: #fff;
-  padding: 10px 18px;
-  font-size: 14px;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 500;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: #2980b9;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background-image: linear-gradient(45deg, var(--primary-hover-color) 0%, #83b1e0 100%);
 }
+
+button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
 
 /* ------------------ Table ------------------ */
 .table-container {
   overflow-x: auto;
-  margin-top: 25px;
+  margin-top: 30px;
+  box-shadow: var(--box-shadow);
+  border-radius: var(--border-radius);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 th, td {
-  padding: 12px 10px;
+  padding: 15px;
   text-align: left;
+  border-bottom: 1px solid var(--border-color);
 }
 
-th {
-  background-color: #3498db;
+thead th {
+  background-color: var(--primary-color);
   color: #fff;
-  border-bottom: 2px solid #2980b9;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
 }
 
-tr:nth-child(even) {
-  background-color: #f8f9fa;
+tbody tr {
+  transition: background-color 0.2s ease;
 }
 
-tr:hover {
-  background-color: #e8f0fe;
+tbody tr:hover {
+  background-color: #eef6ff;
 }
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
 
 /* ------------------ Alerts ------------------ */
 .alert {
-  padding: 10px 15px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: var(--border-radius);
+  font-size: 15px;
+  border-left: 5px solid;
 }
 
 .alert-error {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: var(--error-bg-color);
+  color: var(--error-color);
+  border-color: var(--error-color);
 }
 
 .alert-success {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: var(--success-bg-color);
+  color: var(--success-color);
+  border-color: var(--success-color);
 }
 
-/* ------------------ Form Section ------------------ */
-.form-section {
-  margin-bottom: 30px;
+/* ------------------ Responsive Design ------------------ */
+@media (max-width: 768px) {
+  .container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 1.8em;
+  }
+
+  button, input, select {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+
+  th, td {
+    padding: 12px;
+  }
 }
