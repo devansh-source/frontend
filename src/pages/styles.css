@@ -2,41 +2,47 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ==========================================================================
-   1. CELESTIAL THEME: CSS Variables for Theming (Light & Dark Mode)
+   1. CORE DESIGN SYSTEM: CSS Variables for Theming (Light & Dark)
    ========================================================================== */
 :root {
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --transition-fast: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-medium: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  --transition-medium: 0.3s cubic-bezier(0.3, 0, 0.5, 1);
 
   /* Light Theme */
-  --primary-color: #5d5fef;
-  --primary-color-light: #7b7def;
-  --primary-color-dark: #4b4dbe;
-  --bg-color: #f7f8fc;
-  --surface-color: rgba(255, 255, 255, 0.6);
+  --primary-color: #5a67d8;
+  --primary-color-light: #7f9cf5;
+  --primary-color-dark: #4c51bf;
+  --bg-color: #f7fafc;
+  --surface-color: #ffffff;
   --text-primary: #1a202c;
-  --text-secondary: #4a5568;
-  --border-color: rgba(0, 0, 0, 0.08);
-  --success-color: #28a745;
-  --error-color: #dc3545;
-  --success-bg-color: rgba(40, 167, 69, 0.1);
-  --error-bg-color: rgba(220, 53, 69, 0.1);
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-md: 0 7px 14px rgba(0,0,0,0.06), 0 3px 6px rgba(0,0,0,0.04);
-  --shadow-lg: 0 15px 30px -5px rgba(0, 0, 0, 0.1), 0 8px 16px -8px rgba(0, 0, 0, 0.15);
+  --text-secondary: #718096;
+  --border-color: #e2e8f0;
+  --success-color: #38a169;
+  --error-color: #e53e3e;
+  --success-bg-color: #f0fff4;
+  --error-bg-color: #fff5f5;
+  --shadow-color: 220, 3%, 15%; /* HSL for opacity control */
+  --shadow-sm: 0 1px 2px 0 hsl(var(--shadow-color) / 0.05);
+  --shadow-md: 0 4px 6px -1px hsl(var(--shadow-color) / 0.1), 0 2px 4px -2px hsl(var(--shadow-color) / 0.1);
+  --shadow-lg: 0 10px 15px -3px hsl(var(--shadow-color) / 0.1), 0 4px 6px -4px hsl(var(--shadow-color) / 0.1);
 }
 
 body.dark-mode {
   /* Dark Theme */
-  --primary-color: #7b7def;
-  --primary-color-light: #9a9def;
-  --primary-color-dark: #5d5fef;
+  --primary-color: #7f9cf5;
+  --primary-color-light: #a3bffa;
+  --primary-color-dark: #5a67d8;
   --bg-color: #121826;
-  --surface-color: rgba(26, 32, 44, 0.6);
+  --surface-color: #1a202c;
   --text-primary: #f7fafc;
   --text-secondary: #a0aec0;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color: #2d3748;
+  --success-color: #68d391;
+  --error-color: #fc8181;
+  --success-bg-color: rgba(49, 151, 149, 0.1);
+  --error-bg-color: rgba(197, 48, 48, 0.1);
+  --shadow-color: 220, 50%, 2%;
 }
 
 /* ===========================
@@ -48,7 +54,7 @@ body.dark-mode {
   100% { background-position: 0% 50%; }
 }
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -66,10 +72,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color var(--transition-medium), color var(--transition-medium);
-  overflow-x: hidden;
 }
 
-/* --- Celestial Animated Background --- */
+/* --- Celestial Animated Background (As Requested) --- */
 body::before {
   content: '';
   position: fixed;
@@ -80,23 +85,21 @@ body::before {
   background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
   background-size: 400% 400%;
   animation: celestial-gradient 18s ease infinite;
-  filter: blur(80px);
-  opacity: 0.4;
+  filter: blur(100px);
+  opacity: 0.3;
 }
-body.dark-mode::before { opacity: 0.2; }
+body.dark-mode::before { opacity: 0.15; }
 
-/* --- Main Container (Glassmorphism) --- */
+/* --- Main Container --- */
 .container {
   max-width: 1200px;
   margin: 50px auto;
   background-color: var(--surface-color);
   padding: 40px 50px;
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-color);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  animation: fadeInUp 0.6s var(--transition-medium) both;
+  animation: fadeInUp 0.5s var(--transition-medium) both;
 }
 
 /* ===========================
@@ -106,9 +109,10 @@ h2 {
   text-align: center;
   margin-bottom: 35px;
   color: var(--text-primary);
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
+  text-shadow: 0 1px 2px hsl(var(--shadow-color) / 0.1);
 }
 
 /* ===========================
@@ -118,7 +122,7 @@ h2 {
 
 .nav a, .nav button, button {
   padding: 14px 28px;
-  background: var(--primary-color);
+  background-color: var(--primary-color);
   color: #fff;
   text-decoration: none;
   border-radius: 12px;
@@ -131,30 +135,34 @@ h2 {
 }
 
 .nav a:hover, .nav button:hover, button:hover {
-  background: var(--primary-color-dark);
-  transform: translateY(-4px) scale(1.02);
+  background-color: var(--primary-color-dark);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
 }
 
-.nav a:active, .nav button:active, button:active { transform: translateY(-1px); }
+.nav a:active, .nav button:active, button:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
 
 /* ===========================
-   6. Forms with Floating Labels
+   6. Advanced Forms
    =========================== */
-.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 35px; }
+.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px 25px; margin-bottom: 35px; }
 
 .form-group { position: relative; }
 
 .form-input {
   width: 100%;
-  padding: 20px 16px 8px 16px;
-  border-radius: 12px;
+  padding: 22px 16px 8px 16px;
+  border-radius: 10px;
   border: 1px solid var(--border-color);
   font-size: 1rem;
   background-color: var(--bg-color);
   color: var(--text-primary);
   transition: all var(--transition-fast);
 }
+.form-input::placeholder { color: transparent; }
 
 .form-label {
   position: absolute;
@@ -169,33 +177,37 @@ h2 {
 .form-input:focus, .form-input:not(:placeholder-shown) {
   border-color: var(--primary-color);
   outline: none;
+  box-shadow: 0 0 0 3px hsl(from var(--primary-color) h s l / 0.2);
 }
 
 .form-input:focus + .form-label,
 .form-input:not(:placeholder-shown) + .form-label {
-  top: 6px;
+  top: 7px;
   left: 16px;
   font-size: 0.75rem;
+  font-weight: 500;
   color: var(--primary-color);
 }
 
 /* ===========================
-   7. Data Tables
+   7. Professional Data Tables
    =========================== */
 .table-container { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--shadow-md); }
 table { width: 100%; border-collapse: collapse; }
-thead th { padding: 18px; text-align: left; background-color: transparent; color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; }
-tbody tr { border-top: 1px solid var(--border-color); transition: background-color var(--transition-fast); }
-tbody tr:hover { background-color: rgba(93, 95, 239, 0.05); }
-body.dark-mode tbody tr:hover { background-color: rgba(123, 125, 239, 0.1); }
-td { padding: 18px; color: var(--text-secondary); }
+thead th { padding: 16px 20px; text-align: left; background-color: var(--bg-color); color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 2px solid var(--border-color); }
+tbody tr { border-bottom: 1px solid var(--border-color); transition: background-color var(--transition-fast); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(even) { background-color: var(--bg-color); }
+tbody tr:hover { background-color: hsl(from var(--primary-color) h s l / 0.05); }
+td { padding: 18px 20px; color: var(--text-secondary); }
 td:first-child { color: var(--text-primary); font-weight: 500; }
 .low-stock { color: var(--error-color); font-weight: bold; }
 
 /* ===========================
-   8. Dashboard Cards with 3D Tilt
+   8. "Glow" Dashboard Cards
    =========================== */
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-top: 35px; }
+
 .card {
   background-color: var(--surface-color);
   border-radius: 16px;
@@ -204,16 +216,34 @@ td:first-child { color: var(--text-primary); font-weight: 500; }
   text-align: center;
   border: 1px solid var(--border-color);
   transition: transform var(--transition-medium), box-shadow var(--transition-medium);
-  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
 }
-.card:hover { transform: translateY(-10px) scale(1.03) rotateX(5deg); box-shadow: var(--shadow-lg); }
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), hsl(from var(--primary-color) h s l / 0.15), transparent 40%);
+  opacity: 0;
+  transition: opacity var(--transition-medium);
+  z-index: 0;
+}
+.card:hover::before { opacity: 1; }
+
+.card > * { position: relative; z-index: 1; } /* Keep content above the glow */
 .card h3 { margin-bottom: 10px; font-size: 1.1rem; color: var(--primary-color); font-weight: 600; }
-.card p { font-size: 2.8rem; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+.card p { font-size: 3rem; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
 
 /* ===========================
    9. Alerts & Notifications
    =========================== */
-.alert { padding: 16px; border-radius: 12px; margin-bottom: 25px; font-weight: 500; border: 1px solid transparent; border-left-width: 5px; }
+.alert { padding: 16px 20px; border-radius: 12px; margin-bottom: 25px; font-weight: 500; border: 1px solid transparent; border-left-width: 5px; }
 .alert-success { background-color: var(--success-bg-color); color: var(--success-color); border-color: var(--success-color); }
 .alert-error { background-color: var(--error-bg-color); color: var(--error-color); border-color: var(--error-color); }
 
