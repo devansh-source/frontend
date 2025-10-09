@@ -24,7 +24,7 @@ const Login = () => {
     <div className="auth-layout">
       <div className="auth-left">
         <h1>Inventory Pro</h1>
-        <p>Manage your stock with ease and efficiency.</p>
+        <p>Manage your stock with easy and efficiency.</p>
       </div>
       <div className="auth-right">
         <div className="auth-form-container">
