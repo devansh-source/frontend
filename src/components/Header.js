@@ -1,8 +1,8 @@
 import React from 'react';
-import { useTheme } from '../context/ThemeContext'; // <-- हमारा कस्टम हुक इम्पोर्ट करें
+import { useTheme } from '../context/ThemeContext'; // <-- ThemeContext का उपयोग करें
 
 const Header = () => {
-  const { theme, toggleTheme } = useTheme(); // <-- थीम और टॉगल फंक्शन पाएं
+  const { theme, toggleTheme } = useTheme(); // <-- थीम और टॉगल फंक्शन प्राप्त करें
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -11,9 +11,9 @@ const Header = () => {
 
   return (
     <header className="header">
-      <button onClick={toggleTheme}>
-        {/* If theme is light, show moon icon, else show sun icon */}
-        {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+      {/* Dark mode toggle button */}
+      <button onClick={toggleTheme} className="theme-toggle-btn">
+        {theme === 'light' ? '🌙' : '☀️'} {/* Icon changes with theme */}
       </button>
       <button onClick={handleLogout} className="logout-btn">Logout</button>
     </header>
