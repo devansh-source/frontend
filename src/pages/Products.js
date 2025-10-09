@@ -1,76 +1,149 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "./styles.css";
+import React, { useEffect, useState, useCallback } from "react";
+import { toast } from 'react-toastify';
+import API from "../api";
+import ProductForm from "../components/ProductForm";
+
+// Styles for the table (can be in global.css, but here for simplicity)
+const tableStyles = `
+  .products-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+  }
+  .products-table th, .products-table td {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+  .products-table th {
+    background-color: var(--sidebar-bg);
+  }
+  .products-table tr:nth-of-type(even) {
+    background-color: var(--bg-color);
+  }
+  .status-instock { color: #10b981; font-weight: 500; }
+  .status-lowstock { color: #f59e0b; font-weight: 500; }
+  .status-outofstock { color: #ef4444; font-weight: 500; }
+  .action-buttons { display: flex; gap: 10px; }
+`;
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState();
-  const [price, setPrice] = useState();
-  const token = localStorage.getItem("token");
-
-  const fetchProducts = async () => {
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  
+  const fetchProducts = useCallback(async () => {
     try {
-      const { data } = await axios.get("https://backend-bguf.onrender.com/api/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      setLoading(true);
+      const { data } = await API.get("/api/products");
       setProducts(data);
     } catch (error) {
-      console.error("Failed to fetch products", error);
+      toast.error("Failed to fetch products.");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchProducts();
-  }, [token]);
+  }, [fetchProducts]);
 
-  const addProduct = async () => {
+  const handleOpenModal = (product = null) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(false);
+  };
+
+  const handleSaveProduct = async (productData) => {
     try {
-      await axios.post("https://backend-bguf.onrender.com/api/products", { name, quantity, price }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setName("");
-      setQuantity(0);
-      setPrice(0);
-      fetchProducts(); // Refetch products after adding a new one
+      if (selectedProduct) {
+        // Update existing product
+        await API.put(`/api/products/${selectedProduct._id}`, productData);
+        toast.success("Product updated successfully!");
+      } else {
+        // Add new product
+        await API.post("/api/products", productData);
+        toast.success("Product added successfully!");
+      }
+      handleCloseModal();
+      fetchProducts(); // Refresh the list
     } catch (error) {
-      console.error("Failed to add product", error);
+      toast.error(error.response?.data?.error || "Failed to save product.");
+      console.error(error);
     }
   };
 
-  const deleteProduct = async (id) => {
-    try {
-      await axios.delete(`https://backend-bguf.onrender.com/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(products.filter((p) => p._id !== id));
-    } catch (error) {
-      console.error("Failed to delete product", error);
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await API.delete(`/api/products/${id}`);
+        toast.success("Product deleted successfully!");
+        fetchProducts(); // Refresh the list
+      } catch (error) {
+        toast.error("Failed to delete product.");
+        console.error(error);
+      }
     }
+  };
+
+  const getStatus = (quantity) => {
+    if (quantity === 0) return <span className="status-outofstock">Out of Stock</span>;
+    if (quantity < 10) return <span className="status-lowstock">Low Stock ({quantity})</span>;
+    return <span className="status-instock">In Stock ({quantity})</span>;
   };
 
   return (
-    <div className="container">
-      <h2>Products</h2>
-      <div className="form">
-        <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input placeholder="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-        <input placeholder="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
-        <button onClick={addProduct}>Add Product</button>
+    <div>
+      <style>{tableStyles}</style>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 className="page-header">Manage Products</h1>
+        <button onClick={() => handleOpenModal()}>Add New Product</button>
       </div>
-      <ul>
-        {products.map((p) => (
-          <li key={p._id}>
-            {p.name} | Price: {p.price} | Status:{" "}
-            {p.quantity > 0 ? (
-              `In Stock (${p.quantity})`
-            ) : (
-              <span className="low-stock">Out of Stock</span>
-            )}
-            <button onClick={() => deleteProduct(p._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+
+      {loading ? (
+        <p>Loading products...</p>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table className="products-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p._id}>
+                  <td>{p.name}</td>
+                  <td>₹{p.price}</td>
+                  <td>{getStatus(p.quantity)}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button onClick={() => handleOpenModal(p)}>Edit</button>
+                      <button onClick={() => handleDeleteProduct(p._id)} style={{ backgroundColor: '#ef4444' }}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <ProductForm
+        isOpen={isModalOpen}
+        onRequestClose={handleCloseModal}
+        onSave={handleSaveProduct}
+        product={selectedProduct}
+      />
     </div>
   );
 };

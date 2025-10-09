@@ -1,143 +1,152 @@
-import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
-import "./styles.css";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { toast } from 'react-toastify';
+import API from "../api";
 
-function Sales() {
+const Sales = () => {
   const [sales, setSales] = useState([]);
   const [products, setProducts] = useState([]);
-  const [productId, setProductId] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [loading, setLoading] = useState(true);
   
-  // NEW: State to hold the full object of the selected product
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  // States for the form
+  const [productId, setProductId] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  
+  // State for search
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const API_URL = "https://backend-bguf.onrender.com";
-  const token = localStorage.getItem("token");
-
-  const fetchProducts = useCallback(async () => {
+  const fetchSalesAndProducts = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/products`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(res.data || []);
+      setLoading(true);
+      const [salesRes, productsRes] = await Promise.all([
+        API.get("/api/sales"),
+        API.get("/api/products")
+      ]);
+      setSales((salesRes.data || []).filter(s => s.product));
+      setProducts(productsRes.data || []);
     } catch (err) {
-      console.error("Error fetching products:", err);
+      toast.error("Failed to fetch data.");
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
     }
-  }, [token]);
-
-  const fetchSales = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/sales`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const validSales = (res.data || []).filter(s => s.product !== null);
-      setSales(validSales);
-    } catch (err) {
-      console.error("Error fetching sales:", err);
-    }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
-    fetchProducts();
-    fetchSales();
-  }, [fetchProducts, fetchSales]);
-  
-  // NEW: Handle product selection change
-  const handleProductChange = (e) => {
-    const currentProductId = e.target.value;
-    setProductId(currentProductId);
-    
-    if (currentProductId) {
-      const product = products.find(p => p._id === currentProductId);
-      setSelectedProduct(product);
-    } else {
-      setSelectedProduct(null);
-    }
-    setQuantity(""); // Reset quantity on product change
-  };
+    fetchSalesAndProducts();
+  }, [fetchSalesAndProducts]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmitSale = async (e) => {
     e.preventDefault();
-    if (!productId || !quantity || quantity <= 0) {
-      alert("Please select a product and enter a valid quantity.");
+    const selectedProduct = products.find(p => p._id === productId);
+    
+    if (!selectedProduct) {
+      toast.error("Please select a product.");
       return;
     }
-    
-    if (quantity > selectedProduct.quantity) {
-      alert("Quantity sold cannot be more than the available stock.");
+    if (quantity <= 0 || quantity > selectedProduct.quantity) {
+      toast.error(`Invalid quantity. Available stock: ${selectedProduct.quantity}`);
       return;
     }
 
     try {
-      await axios.post(
-        `${API_URL}/api/sales`,
-        { productId, quantity },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await API.post("/api/sales", { productId, quantity: Number(quantity) });
+      toast.success("Sale recorded successfully!");
       setProductId("");
-      setSelectedProduct(null);
-      setQuantity("");
-      fetchSales(); // Refresh sales list
-      fetchProducts(); // Refresh product list to update stock
+      setQuantity(1);
+      fetchSalesAndProducts(); // Refresh both sales and products list
     } catch (err) {
-      console.error("Error adding sale:", err);
-      alert(err.response?.data?.error || "Failed to add sale.");
+      toast.error(err.response?.data?.error || "Failed to add sale.");
     }
   };
 
+  const handleDeleteSale = async (saleId) => {
+    if (window.confirm("Are you sure? This will restore the product stock.")) {
+      try {
+        await API.delete(`/api/sales/${saleId}`);
+        toast.success("Sale deleted and stock restored!");
+        fetchSalesAndProducts(); // Refresh lists
+      } catch (error) {
+        toast.error("Failed to delete sale.");
+      }
+    }
+  };
+
+  const filteredSales = useMemo(() =>
+    sales.filter(s =>
+      s.product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [sales, searchTerm]
+  );
+  
+  const selectedProductStock = products.find(p => p._id === productId)?.quantity || 0;
+
   return (
-    <div className="container">
-      <h2>Sales Management</h2>
-      <form onSubmit={handleSubmit} className="form">
-        <select value={productId} onChange={handleProductChange}>
-          <option value="">-- Select Product --</option>
-          {products.map((p) => (
-            <option key={p._id} value={p._id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-        
-        {/* NEW: Display for stock status */}
-        {selectedProduct && (
-          <div style={{ width: '100%', padding: '5px 0', fontWeight: '500' }}>
-            {selectedProduct.quantity > 0 ? (
-              <span>In Stock: {selectedProduct.quantity}</span>
-            ) : (
-              <span className="low-stock">This product is out of stock.</span>
-            )}
+    <div>
+      <h1 className="page-header">Sales Management</h1>
+
+      {/* Add Sale Form */}
+      <div className="card" style={{ marginBottom: '2rem' }}>
+        <form onSubmit={handleSubmitSale} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', gap: '1rem', alignItems: 'center' }}>
+          <select value={productId} onChange={e => setProductId(e.target.value)}>
+            <option value="">-- Select Product --</option>
+            {products.map((p) => (
+              <option key={p._id} value={p._id} disabled={p.quantity === 0}>
+                {p.name} ({p.quantity > 0 ? `${p.quantity} in stock` : 'Out of stock'})
+              </option>
+            ))}
+          </select>
+          <input
+            type="number"
+            placeholder="Quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            min="1"
+            max={selectedProductStock}
+            disabled={!productId || selectedProductStock === 0}
+          />
+          <button type="submit" disabled={!productId || selectedProductStock === 0}>Add Sale</button>
+        </form>
+      </div>
+
+      {/* Search and Table */}
+      <div className="card">
+        <input
+          type="text"
+          placeholder="Search by product name..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{ marginBottom: '1rem', maxWidth: '400px' }}
+        />
+        {loading ? <p>Loading sales...</p> : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="products-table"> {/* Reusing styles from Products page */}
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Total Price</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredSales.map((s) => (
+                  <tr key={s._id}>
+                    <td>{s.product.name}</td>
+                    <td>{s.quantity}</td>
+                    <td>₹{s.totalPrice.toFixed(2)}</td>
+                    <td>{new Date(s.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      <button onClick={() => handleDeleteSale(s._id)} style={{ backgroundColor: '#ef4444' }}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-
-        <input
-          type="number"
-          placeholder="Quantity Sold"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          min="1"
-          max={selectedProduct ? selectedProduct.quantity : undefined}
-          disabled={!selectedProduct || selectedProduct.quantity === 0}
-        />
-        <button 
-          type="submit" 
-          disabled={!selectedProduct || selectedProduct.quantity === 0 || !quantity}
-        >
-          Add Sale
-        </button>
-      </form>
-
-      <h3>Recent Sales</h3>
-      <ul>
-        {sales.length === 0 ? (
-          <li>No sales recorded yet.</li>
-        ) : (
-          sales.map((s) => (
-            <li key={s._id}>
-              {s.product?.name || "Unknown Product"} - Quantity: {s.quantity} - Total: Rs.{s.totalPrice}
-            </li>
-          ))
-        )}
-      </ul>
+      </div>
     </div>
   );
 }
