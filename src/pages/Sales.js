@@ -9,8 +9,8 @@ const Sales = () => {
   
   // States for the form
   const [productId, setProductId] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  
+  const [quantity, setQuantity] = useState(""); // CHANGED: Default quantity is now an empty string
+
   // State for search
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -43,6 +43,7 @@ const Sales = () => {
       toast.error("Please select a product.");
       return;
     }
+    // This validation correctly handles an empty string ('') for quantity
     if (quantity <= 0 || quantity > selectedProduct.quantity) {
       toast.error(`Invalid quantity. Available stock: ${selectedProduct.quantity}`);
       return;
@@ -52,7 +53,7 @@ const Sales = () => {
       await API.post("/api/sales", { productId, quantity: Number(quantity) });
       toast.success("Sale recorded successfully!");
       setProductId("");
-      setQuantity("");
+      setQuantity(""); // CHANGED: Reset quantity to an empty string
       fetchSalesAndProducts(); 
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to add sale.");
@@ -83,7 +84,7 @@ const Sales = () => {
     <div>
       <h1 className="page-header">Sales Management</h1>
 
-      {}
+      {/* Form Card */}
       <div className="card" style={{ marginBottom: '2rem' }}>
         <form onSubmit={handleSubmitSale} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', gap: '1rem', alignItems: 'center' }}>
           <select value={productId} onChange={e => setProductId(e.target.value)}>
@@ -103,11 +104,11 @@ const Sales = () => {
             max={selectedProductStock}
             disabled={!productId || selectedProductStock === 0}
           />
-          <button type="submit" disabled={!productId || selectedProductStock === 0}>Add Sale</button>
+          <button type="submit" disabled={!productId || !quantity || selectedProductStock === 0}>Add Sale</button>
         </form>
       </div>
 
-      {}
+      {/* Sales List Card */}
       <div className="card">
         <input
           type="text"
@@ -118,7 +119,7 @@ const Sales = () => {
         />
         {loading ? <p>Loading sales...</p> : (
           <div style={{ overflowX: 'auto' }}>
-            <table className="products-table"> {}
+            <table className="products-table">
               <thead>
                 <tr>
                   <th>Product Name</th>
