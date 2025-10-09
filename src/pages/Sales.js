@@ -52,7 +52,7 @@ const Sales = () => {
       await API.post("/api/sales", { productId, quantity: Number(quantity) });
       toast.success("Sale recorded successfully!");
       setProductId("");
-      setQuantity(1);
+      setQuantity("");
       fetchSalesAndProducts(); 
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to add sale.");
