@@ -1,9 +1,8 @@
 import React from 'react';
-import { useTheme } from '../context/ThemeContext'; // <-- ThemeContext का उपयोग करें
+import { useTheme } from '../context/ThemeContext';
 
 const Header = () => {
-  const { theme, toggleTheme } = useTheme(); // <-- थीम और टॉगल फंक्शन प्राप्त करें
-
+  const { theme, toggleTheme } = useTheme();
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.href = "/login";
@@ -13,7 +12,7 @@ const Header = () => {
     <header className="header">
       {/* Dark mode toggle button */}
       <button onClick={toggleTheme} className="theme-toggle-btn">
-        {theme === 'light' ? '🌙' : '☀️'} {/* Icon changes with theme */}
+        {theme === 'light' ? '🌙' : '☀️'} {}
       </button>
       <button onClick={handleLogout} className="logout-btn">Logout</button>
     </header>

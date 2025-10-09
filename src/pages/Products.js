@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 import API from "../api";
 import ProductForm from "../components/ProductForm";
 
-// Styles for the table (can be in global.css, but here for simplicity)
 const tableStyles = `
   .products-table {
     width: 100%;
@@ -63,16 +62,14 @@ const Products = () => {
   const handleSaveProduct = async (productData) => {
     try {
       if (selectedProduct) {
-        // Update existing product
         await API.put(`/api/products/${selectedProduct._id}`, productData);
         toast.success("Product updated successfully!");
       } else {
-        // Add new product
         await API.post("/api/products", productData);
         toast.success("Product added successfully!");
       }
       handleCloseModal();
-      fetchProducts(); // Refresh the list
+      fetchProducts();
     } catch (error) {
       toast.error(error.response?.data?.error || "Failed to save product.");
       console.error(error);
@@ -84,7 +81,7 @@ const Products = () => {
       try {
         await API.delete(`/api/products/${id}`);
         toast.success("Product deleted successfully!");
-        fetchProducts(); // Refresh the list
+        fetchProducts(); 
       } catch (error) {
         toast.error("Failed to delete product.");
         console.error(error);

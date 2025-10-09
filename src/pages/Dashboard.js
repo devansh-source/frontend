@@ -32,7 +32,6 @@ const Dashboard = () => {
         ]);
 
         setProducts(productRes.data);
-        // Ensure sales data is valid and product is not null
         const validSales = (salesRes.data || []).filter(s => s.product);
         setSales(validSales);
 
@@ -46,13 +45,11 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // --- CALCULATIONS ---
   const totalRevenue = sales.reduce((acc, s) => acc + s.totalPrice, 0);
   const lowStockCount = products.filter((p) => p.quantity > 0 && p.quantity < 10).length;
   const outOfStockCount = products.filter(p => p.quantity === 0).length;
   const inStockCount = products.length - lowStockCount - outOfStockCount;
 
-  // --- DATA FOR CHARTS ---
   const topSellingProducts = sales
     .reduce((acc, sale) => {
       const productName = sale.product.name;
@@ -86,7 +83,7 @@ const Dashboard = () => {
     <div>
       <h1 className="page-header">Dashboard</h1>
 
-      {/* Stats Cards */}
+      {}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
         <div className="card">
           <h3 style={{ color: 'var(--text-secondary)' }}>Total Revenue</h3>
@@ -106,7 +103,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Charts */}
+      {}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
         <div className="card">
           <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Top 5 Selling Products</h3>

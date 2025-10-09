@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 
-// Modal को ऐप के मेन कंटेंट से जोड़ने के लिए
 Modal.setAppElement('#root');
 
 const ProductForm = ({ isOpen, onRequestClose, onSave, product }) => {
@@ -9,14 +8,12 @@ const ProductForm = ({ isOpen, onRequestClose, onSave, product }) => {
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
 
-  // जब product prop बदलता है (एडिट के लिए), तो फॉर्म को उसकी वैल्यू से भरें
   useEffect(() => {
     if (product) {
       setName(product.name);
       setQuantity(product.quantity);
       setPrice(product.price);
     } else {
-      // अगर नया प्रोडक्ट है, तो फॉर्म खाली करें
       setName('');
       setQuantity('');
       setPrice('');
